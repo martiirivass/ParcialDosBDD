@@ -2,25 +2,26 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import router from "./routes/index.js";
 
 dotenv.config();
 
 const app = express();
 
-// Middlewares (funciones que se ejecutan antes de llegar a una ruta específica o entre rutas.)
 app.use(express.json());
 app.use(cors());
 
-// Conexión a MongoDB
+// Conexión a la base de datos
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log(" Conectado a MongoDB"))
-  .catch(err => console.error(" Error al conectar MongoDB:", err));
+  .then(() => console.log("Conectado a la base de datos"))
+  .catch(err => console.error("Error al conectar a la base de datos:", err));
 
-// Rutas base
+// Rutas principales
+app.use("/api", router);
+
 app.get("/", (req, res) => {
-  res.json({ message: "API REST Parcial BD2 funcionando " });
+  res.json({ message: "API del Parcial de Bases de Datos II funcionando correctamente" });
 });
 
-// Servidor
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor iniciado en el puerto ${PORT}`));

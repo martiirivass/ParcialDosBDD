@@ -9,7 +9,9 @@ import { verificarToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// obtener el carrito del usuario logueado
+// obtener el carrito del usuario logueado   --- 
+// es decir que necesitamos el token del cliente para verlo, no se puede ver con su id
+
 router.get("/", verificarToken, obtenerCarrito);
 
 // agregar producto al carrito

@@ -3,16 +3,10 @@ import { registrarUsuario, loginUsuario } from "../controllers/authController.js
 
 const router = express.Router();
 
-/**
- * @route POST /api/auth/register
- * @desc Registrar un nuevo usuario
- */
+
 router.post("/register", registrarUsuario);  //definimos Rutas
 
-/**
- * @route POST /api/auth/login
- * @desc Iniciar sesión y obtener un token JWT
- */
+
 router.post("/login", loginUsuario);  //Definimos rutas
 
 export default router;
