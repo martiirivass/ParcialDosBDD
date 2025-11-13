@@ -2,10 +2,10 @@ import Usuario from "../models/Usuario.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Registrar usuario
+// Registrar usuario (solo cliente)
 export const registrarUsuario = async (req, res) => {
   try {
-    const { nombre, correo, contraseña, rol } = req.body;
+    const { nombre, correo, contraseña, direccion, telefono } = req.body;
 
     // Verificar si el usuario ya existe
     const usuarioExistente = await Usuario.findOne({ correo });
@@ -13,16 +13,17 @@ export const registrarUsuario = async (req, res) => {
       return res.status(400).json({ success: false, message: "El correo ya está registrado" });
     }
 
-    // Encriptar la contraseña
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(contraseña, salt);
+    // Encriptar contraseña
+    const hash = await bcrypt.hash(contraseña, 10);
 
-    // Crear el usuario nuevo
+    // Crear el usuario SIEMPRE como cliente
     const nuevoUsuario = new Usuario({
       nombre,
       correo,
       contraseña: hash,
-      rol: rol || "cliente"
+      direccion,
+      telefono,
+      rol: "cliente"
     });
 
     await nuevoUsuario.save();
@@ -33,24 +34,21 @@ export const registrarUsuario = async (req, res) => {
   }
 };
 
-// Login de usuario
+// Login
 export const loginUsuario = async (req, res) => {
   try {
     const { correo, contraseña } = req.body;
 
-    // Buscar el usuario por correo
     const usuario = await Usuario.findOne({ correo });
     if (!usuario) {
       return res.status(404).json({ success: false, message: "Usuario no encontrado" });
     }
 
-    // Comparar contraseña
     const passwordValida = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!passwordValida) {
       return res.status(401).json({ success: false, message: "Contraseña incorrecta" });
     }
 
-    // Crear token JWT
     const token = jwt.sign(
       { id: usuario._id, rol: usuario.rol },
       process.env.JWT_SECRET,
@@ -62,6 +60,7 @@ export const loginUsuario = async (req, res) => {
       message: "Login exitoso",
       token
     });
+
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

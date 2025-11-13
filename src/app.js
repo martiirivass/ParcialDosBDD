@@ -1,19 +1,43 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cors from "cors";
 import router from "./routes/index.js";
+
+import Usuario from "./models/Usuario.js";
+import bcrypt from "bcryptjs";
 
 dotenv.config();
 
 const app = express();
-
 app.use(express.json());
-app.use(cors());
+
+// Crear admin automáticamente si no existe
+const crearAdminDefault = async () => {
+  try {
+    const existe = await Usuario.findOne({ correo: "admin@mail.com" });
+    if (existe) return;
+
+    const contraseñaHash = await bcrypt.hash("admin123", 10);
+
+    await Usuario.create({
+      nombre: "Administrador",
+      correo: "admin@mail.com",
+      contraseña: contraseñaHash,
+      rol: "administrador"
+    });
+
+    console.log("Admin creado automáticamente");
+  } catch (err) {
+    console.log("Error creando admin:", err.message);
+  }
+};
 
 // Conexión a la base de datos
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Conectado a la base de datos"))
+  .then(async () => {
+    console.log("Conectado a la base de datos");
+    await crearAdminDefault(); // CREA EL ADMIN
+  })
   .catch(err => console.error("Error al conectar a la base de datos:", err));
 
 // Rutas principales

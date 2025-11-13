@@ -4,13 +4,32 @@ const carritoSchema = new mongoose.Schema({
   usuario: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Usuario",
-    required: true,
-    unique: true
+    unique: true,
+    required: true
   },
-  productos: [{
-    producto: { type: mongoose.Schema.Types.ObjectId, ref: "Producto" },
-    cantidad: { type: Number, default: 1, min: 1 }
-  }]
+  items: [
+    {
+      producto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Producto",
+        required: true
+      },
+      cantidad: {
+        type: Number,
+        required: true,
+        min: 1,
+        default: 1
+      }
+    }
+  ]
 }, { timestamps: true });
+
+// Asegurar que items siempre sea un array
+carritoSchema.pre("save", function (next) {
+  if (!Array.isArray(this.items)) {
+    this.items = [];
+  }
+  next();
+});
 
 export default mongoose.model("Carrito", carritoSchema);

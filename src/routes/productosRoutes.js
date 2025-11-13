@@ -10,16 +10,16 @@ import { verificarToken, verificarAdmin } from "../middlewares/authMiddleware.js
 
 const router = express.Router();
 
-// Listar todos los productos (público)
+// Listar todos los productos
 router.get("/", listarProductos);
 
-// Otener producto por ID (público)
+// Obtener un producto por ID
 router.get("/:id", obtenerProducto);
 
-// Crear producto (solo admin)
+// Crear nuevo producto (solo admin)
 router.post("/", verificarToken, verificarAdmin, crearProducto);
 
-//  Actualizar producto (solo admin)
+// Actualizar producto (solo admin)
 router.put("/:id", verificarToken, verificarAdmin, actualizarProducto);
 
 // Eliminar producto (solo admin)
